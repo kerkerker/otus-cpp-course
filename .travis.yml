@@ -1,6 +1,10 @@
+dist: bionic
+addons:
+  apt:
+    update: true
+    packages:
+      - libboost-test-dev
 language: cpp
-install:
-  - sudo apt install libboost-test-dev -y
 script:
   - mkdir build
   - cd build
