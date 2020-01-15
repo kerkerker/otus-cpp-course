@@ -37,3 +37,7 @@ set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 set(CPACK_PACKAGE_CONTACT ker@scryptmail.com)
 
 include(CPack)
+
+enable_testing()
+
+add_test(test_version test_version)
