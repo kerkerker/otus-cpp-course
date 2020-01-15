@@ -1,0 +1,9 @@
+language: cpp
+install:
+  - sudo apt install libboost-test-dev -y
+script:
+  - mkdir build
+  - cd build
+  - cmake ../
+  - cmake ../build .
+  - cmake ../build . --target package
