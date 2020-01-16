@@ -8,7 +8,7 @@ addons:
 language: cpp
 before_script:
   - cd /usr/src/gtest
-  - sudo cmake .
+  - sudo -E cmake .
   - sudo -E cmake --build . --target install
 script:
   - mkdir build
