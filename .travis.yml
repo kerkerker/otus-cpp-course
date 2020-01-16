@@ -5,6 +5,8 @@ addons:
     packages:
       - libboost-test-dev
       - libgtest-dev
+      - build-essential
+      - cmake
 language: cpp
 before_script:
   - cd /usr/src/gtest
