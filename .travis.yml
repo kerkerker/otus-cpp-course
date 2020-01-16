@@ -9,7 +9,7 @@ language: cpp
 before_script:
   - cd /usr/src/gtest
   - sudo cmake .
-  - sudo cmake --build . --target install
+  - sudo -E cmake --build . --target install
 script:
   - mkdir build
   - cd build
