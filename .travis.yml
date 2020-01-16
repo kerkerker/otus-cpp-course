@@ -4,7 +4,12 @@ addons:
     update: true
     packages:
       - libboost-test-dev
+      - libgtest-dev
 language: cpp
+before_script:
+  - cd /usr/src/gtest
+  - sudo cmake .
+  - sudo cmake --build . --target install
 script:
   - mkdir build
   - cd build
