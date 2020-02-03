@@ -34,17 +34,7 @@ IpAddress::IpAddress(std::string const &ip, char delimiter) {
 }
 
 bool IpAddress::operator>(const IpAddress &rhs) const {
-  for (auto first = ip_address_.begin(), first_rhs = rhs.ip_address_.begin();
-       (first != ip_address_.end()) && (first_rhs != rhs.ip_address_.end());
-       ++first, ++first_rhs) {
-    if (*first > *first_rhs) {
-      return true;
-    }
-    if (*first_rhs > *first) {
-      return false;
-    }
-  }
-  return false;
+  return ip_address_ > rhs.ip_address_;
 }
 
 uint8_t &IpAddress::operator[](size_t idx) {
