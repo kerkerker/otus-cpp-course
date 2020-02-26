@@ -44,9 +44,8 @@ struct is_string_like<T,
 template<class T>
 constexpr bool is_string_like_v = is_string_like<T>::value;
 
-template<typename T, typename = typename std::enable_if_t<is_iterable_v<T>>,
-    typename = typename std::enable_if_t<!is_string_like_v<T>>>
-void print_ip(const T& container, std::ostream& out = std::cout)
+template<typename T>
+std::enable_if_t<is_iterable_v<T> && !is_string_like_v<T>> print_ip(const T& container, std::ostream& out = std::cout)
 {
   for (auto it = std::begin(container); it != std::end(container); ++it) {
     if (it != std::begin(container)) {
@@ -56,8 +55,8 @@ void print_ip(const T& container, std::ostream& out = std::cout)
   }
 }
 
-template<typename T, typename = typename std::enable_if_t<std::is_integral_v<T>>>
-void print_ip(T ip, std::ostream& out = std::cout)
+template<typename T>
+std::enable_if_t<std::is_integral_v<T>> print_ip(T ip, std::ostream& out = std::cout)
 {
   const size_t bytes_count = sizeof(T);
   const auto& byte_array = reinterpret_cast<std::array<uint8_t, bytes_count>&>(ip);
@@ -84,11 +83,9 @@ void print_ip(std::string_view ip, std::ostream& out = std::cout)
 }
 
 template<typename T, typename... Types>
-void print_ip(const std::tuple<T, Types...>& ip, std::ostream& os = std::cout)
+std::enable_if_t<std::is_integral_v<T> && (std::is_same_v<T, Types> && ...)>
+print_ip(const std::tuple<T, Types...>& ip, std::ostream& os = std::cout)
 {
-  static_assert(std::is_integral_v<T>);
-  static_assert((std::is_same_v<T, Types> && ...));
-
   std::apply([&os](const auto& ... args) {
     size_t n{0};
     constexpr size_t tuple_size = sizeof...(Types);
