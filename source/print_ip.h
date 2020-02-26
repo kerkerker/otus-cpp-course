@@ -4,34 +4,55 @@
 #include <iostream>
 #include <string_view>
 
-template<typename T,
-    typename Iter = decltype(std::begin(std::declval<T>())),
-    typename = decltype(std::begin(std::declval<T>()) != std::end(std::declval<T>())),
-    typename = typename std::enable_if_t<std::is_integral_v<
-        typename std::remove_reference_t<decltype(*std::declval<Iter>())>>>>
-struct is_iterable
-{
-  static constexpr bool value = true;
+template<typename, typename = std::void_t<>>
+struct is_iterable : std::false_type {
 };
 
-// TODO:
-template<typename T,
-    typename = typename std::enable_if_t<std::is_same_v<typename std::remove_reference<T>, std::string>>,
-    typename = typename std::enable_if_t<std::is_same_v<typename std::remove_reference<T>, char*>>>
-struct is_string_like
-{
-  static constexpr bool value = true;
+template<typename T>
+struct is_iterable<T,
+                   std::void_t<decltype(++std::begin(std::declval<T>()) != std::end(std::declval<T>())),
+                               typename std::enable_if_t<std::is_integral_v<
+                                   typename std::remove_reference_t<decltype(*std::declval<decltype(std::begin(
+                                       std::declval<T>()))>())>>  >>>
+    : std::true_type {
 };
 
-template<typename T, typename = typename std::enable_if<is_iterable<T>::value>,
-    typename = typename std::enable_if_t<!std::is_same_v<T, std::string>>>
+template<class T>
+constexpr bool is_iterable_v = is_iterable<T>::value;
+
+template<class T>
+struct remove_cvref {
+  typedef std::remove_cv_t<std::remove_reference_t<T>> type;
+};
+
+template<class T>
+using remove_cvref_t = typename remove_cvref<T>::type;
+
+template<typename, typename=std::void_t<>>
+struct is_string_like : std::false_type {
+};
+
+template<typename T>
+struct is_string_like<T,
+                      std::void_t<
+                          typename std::enable_if_t<std::is_same_v<remove_cvref_t<T>, std::string> ||
+                              std::is_same_v<remove_cvref_t<T>, char*> ||
+                              std::is_same_v<remove_cvref<T>, std::string_view >> >>
+    : std::true_type {
+};
+
+template<class T>
+constexpr bool is_string_like_v = is_string_like<T>::value;
+
+template<typename T, typename = typename std::enable_if_t<is_iterable_v<T>>,
+    typename = typename std::enable_if_t<!is_string_like_v<T>>>
 void print_ip(const T& container, std::ostream& out = std::cout)
 {
   for (auto it = std::begin(container); it != std::end(container); ++it) {
     if (it != std::begin(container)) {
       out << '.';
     }
-    out << *it;
+    out << static_cast<uint32_t>(*it);
   }
 }
 
