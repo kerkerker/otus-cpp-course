@@ -3,8 +3,8 @@
 #include <map>
 #include <set>
 
-#include "Allocator.h"
-#include "CustomList.h"
+#include "custom_allocator.h"
+#include "custom_list.h"
 
 constexpr size_t factorial(int n)
 {
