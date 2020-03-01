@@ -54,6 +54,16 @@ struct is_string_like<T,
 template<class T>
 constexpr bool is_string_like_v = is_string_like<T>::value;
 
+template<typename InputIt>
+void print_containter(InputIt first, InputIt last, std::ostream& out = std::cout) {
+  for (auto it = first; it != last; ++it) {
+    if (it != first) {
+      out << '.';
+    }
+    out << static_cast<uint32_t>(*it);
+  }
+}
+
 /** Outputs container to the out in the format of decimal numbers each separated by a single dot
  *
  * @tparam T - container type
@@ -64,12 +74,7 @@ constexpr bool is_string_like_v = is_string_like<T>::value;
 template<typename T>
 std::enable_if_t<is_iterable_v<T> && !is_string_like_v<T>> print_ip(const T& container, std::ostream& out = std::cout)
 {
-  for (auto it = std::begin(container); it != std::end(container); ++it) {
-    if (it != std::begin(container)) {
-      out << '.';
-    }
-    out << static_cast<uint32_t>(*it);
-  }
+  print_containter(std::begin(container), std::end(container));
 }
 
 /** Outputs integral value ip to the out in the format of decimal numbers (one byte in size) each separated
@@ -86,19 +91,9 @@ std::enable_if_t<std::is_integral_v<T>> print_ip(T ip, std::ostream& out = std::
   const size_t bytes_count = sizeof(T);
   const auto& byte_array = reinterpret_cast<std::array<uint8_t, bytes_count>&>(ip);
 #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN
-  for (auto it = std::begin(byte_array); it != std::end(byte_array); ++it) {
-        if (it != std::begin(byte_array)) {
-            out << '.';
-        }
-        out << static_cast<uint32_t>(*it);
-    }
+  print_containter(std::begin(container), std::end(container));
 #else
-  for (auto it = std::rbegin(byte_array); it != std::rend(byte_array); ++it) {
-    if (it != std::rbegin(byte_array)) {
-      out << '.';
-    }
-    out << static_cast<uint32_t>(*it);
-  }
+  print_containter(std::rbegin(byte_array), std::rend(byte_array));
 #endif
 }
 
