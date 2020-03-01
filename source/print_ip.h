@@ -1,9 +1,14 @@
+#pragma once
+
 #include <tuple>
 #include <type_traits>
 #include <string>
 #include <iostream>
 #include <string_view>
 
+/**
+ * Checks if a type is iterable and consists of integral values
+ */
 template<typename, typename = std::void_t<>>
 struct is_iterable : std::false_type {
 };
@@ -20,6 +25,8 @@ struct is_iterable<T,
 template<class T>
 constexpr bool is_iterable_v = is_iterable<T>::value;
 
+/** Removes const or/and volatile specifiers from the given type
+ */
 template<class T>
 struct remove_cvref {
   typedef std::remove_cv_t<std::remove_reference_t<T>> type;
@@ -28,6 +35,9 @@ struct remove_cvref {
 template<class T>
 using remove_cvref_t = typename remove_cvref<T>::type;
 
+/**
+ * Checks if a type is std::string_view or std::string or char*
+ */
 template<typename, typename=std::void_t<>>
 struct is_string_like : std::false_type {
 };
@@ -44,6 +54,13 @@ struct is_string_like<T,
 template<class T>
 constexpr bool is_string_like_v = is_string_like<T>::value;
 
+/** Outputs container to the out in the format of decimal numbers each separated by a single dot
+ *
+ * @tparam T - container type
+ * @param container - IP address
+ * @param out - output stream
+ * @return
+ */
 template<typename T>
 std::enable_if_t<is_iterable_v<T> && !is_string_like_v<T>> print_ip(const T& container, std::ostream& out = std::cout)
 {
@@ -55,6 +72,14 @@ std::enable_if_t<is_iterable_v<T> && !is_string_like_v<T>> print_ip(const T& con
   }
 }
 
+/** Outputs integral value ip to the out in the format of decimal numbers (one byte in size) each separated
+ * by a single dot
+ *
+ * @tparam T - ip type
+ * @param ip - IP address
+ * @param out - output stream
+ * @return
+ */
 template<typename T>
 std::enable_if_t<std::is_integral_v<T>> print_ip(T ip, std::ostream& out = std::cout)
 {
@@ -77,11 +102,24 @@ std::enable_if_t<std::is_integral_v<T>> print_ip(T ip, std::ostream& out = std::
 #endif
 }
 
+/** Outputs ip to the out in the string format
+ *
+ * @param ip - IP address
+ * @param out - output stream
+ */
 void print_ip(std::string_view ip, std::ostream& out = std::cout)
 {
   out << ip;
 }
 
+/** Outputs tuple ip to the out in the format of decimal numbers each separated by a single dot
+ *
+ * @tparam T - type of the first element in the tuple ip
+ * @tparam Types - types of the other elements in the tuple ip
+ * @param ip - IP address
+ * @param os - output stream
+ * @return
+ */
 template<typename T, typename... Types>
 std::enable_if_t<std::is_integral_v<T> && (std::is_same_v<T, Types> && ...)>
 print_ip(const std::tuple<T, Types...>& ip, std::ostream& os = std::cout)
