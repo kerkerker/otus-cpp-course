@@ -6,6 +6,7 @@ addons:
       - libgtest-dev
       - build-essential
       - cmake
+      - doxygen
 language: cpp
 before_script:
   - cd /usr/src/gtest
@@ -19,10 +20,18 @@ script:
   - cmake --build .
   - cmake --build . --target test
   - cmake --build . --target package
+  - doxygen ../Doxyfile
 deploy:
-  provider: script
+  - provider: script
   skip_cleanup: true
   script:
     - curl -T print_ip-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -ukerkerker:$BINTRAY_API_KEY "https://api.bintray.com/content/kerkerker/otus-cpp-course/print_ip/0.0.$TRAVIS_BUILD_NUMBER/print_ip-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=bionic;deb_component=main;deb_architecture=amd64;publish=1"
   on:
     branch: 04.homework
+  - provider: pages
+    repo: kerkerker/otus-print-ip-doc
+    skip_cleanup: true
+    local_dir: $TRAVIS_BUILD_DIR/build/html
+    github_token: $GITHUB_TOKEN
+    on:
+      branch: 04.homework
