@@ -26,7 +26,7 @@ deploy:
   - provider: script
     skip_cleanup: true
     script:
-    - curl -T print_ip-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -ukerkerker:$BINTRAY_API_KEY "https://api.bintray.com/content/kerkerker/otus-cpp-course/print_ip/0.0.$TRAVIS_BUILD_NUMBER/print_ip-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=bionic;deb_component=main;deb_architecture=amd64;publish=1"
+    - curl -T $TRAVIS_BUILD_DIR/build/print_ip-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -ukerkerker:$BINTRAY_API_KEY "https://api.bintray.com/content/kerkerker/otus-cpp-course/print_ip/0.0.$TRAVIS_BUILD_NUMBER/print_ip-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=bionic;deb_component=main;deb_architecture=amd64;publish=1"
     on:
       branch: 04.homework
   - provider: pages
