@@ -20,7 +20,8 @@ script:
   - cmake --build .
   - cmake --build . --target test
   - cmake --build . --target package
-  - doxygen ../Doxyfile
+  - cd ..
+  - doxygen Doxyfile
 deploy:
   - provider: script
     skip_cleanup: true
@@ -31,7 +32,7 @@ deploy:
   - provider: pages
     repo: kerkerker/otus-print-ip-doc
     skip_cleanup: true
-    local_dir: $TRAVIS_BUILD_DIR/build/html
+    local_dir: $TRAVIS_BUILD_DIR/html
     github_token: $GITHUB_TOKEN
     on:
       branch: 04.homework
