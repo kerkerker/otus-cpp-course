@@ -1,0 +1,33 @@
+dist: bionic
+addons:
+  apt:
+    update: true
+    packages:
+      - build-essential
+      - cmake
+      - doxygen
+language: cpp
+before_script:
+  - cd $TRAVIS_BUILD_DIR
+script:
+  - mkdir build
+  - cd build
+  - cmake ../source
+  - cmake --build .
+  - cmake --build . --target package
+  - cd ..
+  - doxygen Doxyfile
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script:
+      - curl -T $TRAVIS_BUILD_DIR/build/editor-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -ukerkerker:$BINTRAY_API_KEY "https://api.bintray.com/content/kerkerker/otus-cpp-course/editor/0.0.$TRAVIS_BUILD_NUMBER/editor-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=bionic;deb_component=main;deb_architecture=amd64;publish=1"
+    on:
+      branch: 05.homework
+  - provider: pages
+    repo: kerkerker/otus-editor-doc
+    skip_cleanup: true
+    local_dir: $TRAVIS_BUILD_DIR/html
+    github_token: $GITHUB_TOKEN_ALL
+    on:
+      branch: 05.homework

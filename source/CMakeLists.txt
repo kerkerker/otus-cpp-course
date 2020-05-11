@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.10)
+
+if (NOT DEFINED ENV{TRAVIS_BUILD_NUMBER})
+    set(ENV{TRAVIS_BUILD_NUMBER} 1)
+    message(STATUS "TRAVIS_BUILD_NUMBER must be set! Using default ($ENV{TRAVIS_BUILD_NUMBER}) instead...")
+endif ()
+
+project(editor VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED)
+
+add_executable(editor main.cpp Renderer.cpp MVC.cpp Document.cpp Exporter.cpp)
+
+install(TARGETS editor RUNTIME DESTINATION bin)
+
+set(CPACK_GENERATOR DEB)
+
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+
+set(CPACK_PACKAGE_CONTACT ker@scryptmail.com)
+
+include(CPack)
