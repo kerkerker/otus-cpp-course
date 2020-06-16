@@ -5,23 +5,25 @@ if (NOT DEFINED ENV{TRAVIS_BUILD_NUMBER})
     message(STATUS "TRAVIS_BUILD_NUMBER must be set! Using default ($ENV{TRAVIS_BUILD_NUMBER}) instead...")
 endif ()
 
-project(bulk VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+project(bulkmt VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 
+find_package(Threads)
 find_package(GTest REQUIRED)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED)
 
-add_executable(bulk main.cpp bulk.cpp)
-add_executable(test_bulk test.cpp bulk.cpp)
+add_executable(bulkmt main.cpp bulk.cpp)
+add_executable(test_bulkmt test.cpp bulk.cpp)
 
-set_target_properties(test_bulk PROPERTIES
+set_target_properties(test_bulkmt PROPERTIES
         INCLUDE_DIRECTORIES ${GTEST_INCLUDE_DIRS}
         )
 
-target_link_libraries(test_bulk GTest::GTest GTest::Main)
+target_link_libraries(bulkmt ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_bulkmt GTest::GTest GTest::Main ${CMAKE_THREAD_LIBS_INIT})
 
-install(TARGETS bulk RUNTIME DESTINATION bin)
+install(TARGETS bulkmt RUNTIME DESTINATION bin)
 
 set(CPACK_GENERATOR DEB)
 
@@ -35,4 +37,4 @@ include(CPack)
 
 enable_testing()
 
-add_test(test_bulk test_bulk)
+add_test(test_bulkmt test_bulkmt)

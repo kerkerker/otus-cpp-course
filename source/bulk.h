@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ConcurrentQueue.h"
+
 #include <memory>
 #include <ctime>
 #include <string>
@@ -8,6 +10,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
+#include <thread>
 
 template<typename T>
 class Observer {
@@ -68,6 +72,12 @@ public:
 
   void Clear();
 
+  bool IsEmpty() const;
+
+  bool IsLast() const;
+
+  void SetLast();
+
   [[nodiscard]] time_t Timestamp() const;
 
   [[nodiscard]] auto begin() const;
@@ -75,6 +85,7 @@ public:
   [[nodiscard]] auto end() const;
 
 private:
+  bool is_last_ = false;
   std::vector<Command> commands_;
 };
 
@@ -89,10 +100,19 @@ private:
   std::istream &is_;
 };
 
+struct LogStatistics {
+  size_t strings = 0;
+  size_t commands = 0;
+  size_t blocks = 0;
+};
+
+std::ostream& operator<<(std::ostream& os, LogStatistics const& log_statistics);
+
 class CommandAggregator : public BasicObservable<Bunch>, public Observer<Command> {
 public:
-  explicit CommandAggregator(size_t bunch_size);
+  explicit CommandAggregator(size_t bunch_size, std::ostream& log_os = std::cout);
   void Update(Command const &cmd) override;
+  ~CommandAggregator();
 
 private:
   void Flush();
@@ -100,19 +120,42 @@ private:
   Bunch bunch_;
   size_t bunch_size_;
   size_t open_braces_ = 0;
+  LogStatistics log_statistics_;
+  std::ostream& log_os_;
 };
 
 class BunchWriter : public Observer<Bunch> {
 public:
-  explicit BunchWriter(std::ostream &os);
+  explicit BunchWriter(std::ostream &os, std::ostream &log_os = std::cout);
   void Update(Bunch const &bunch) override;
+  ~BunchWriter();
 
 private:
+  void Write();
+
   std::ostream &os_;
+  ConcurrentQueue<Bunch> queue_;
+  mutable LogStatistics log_statistics_;
+  std::ostream &log_os_;
+
+  std::thread thread_;
 };
 
 class BunchFileWriter : public Observer<Bunch> {
+ public:
+  explicit BunchFileWriter(std::ostream &log_os = std::cout);
   void Update(Bunch const &bunch) override;
+  ~BunchFileWriter();
+
+ private:
+  void Write();
+
+  ConcurrentQueue<Bunch> queue_;
+  std::unordered_map<std::thread::id, LogStatistics> log_statistics_;
+  std::ostream &log_os_;
+
+  std::thread first_thread_;
+  std::thread second_thread_;
 };
 
 
