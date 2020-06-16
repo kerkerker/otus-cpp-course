@@ -1,23 +1,17 @@
-#include "bulk.h"
-
-#include <iostream>
+#include "async.h"
 
 int main(int argc, char **argv) {
-  if (argc != 2) {
-    std::cout << "Usage: " << argv[0] << " <N>" << std::endl;
-    return 1;
-  }
 
-  auto cmd_reader = std::make_shared<CommandReader>(std::cin);
-  auto cmd_aggregator = std::make_shared<CommandAggregator>(std::stoul(argv[1]));
-  auto bunch_writer = std::make_shared<BunchWriter>(std::cout);
-  auto bunch_file_writer = std::make_shared<BunchFileWriter>();
+  std::size_t bulk = 5;
+  auto h = async::connect(bulk);
+  auto h2 = async::connect(bulk);
+  async::receive(h, "1", 1);
+  async::receive(h2, "1\n", 2);
+  async::receive(h, "\n2\n3\n4\n5\n6\n{\na\n", 15);
+  async::receive(h, "b\nc\nd\n}\n89\n", 11);
+  async::disconnect(h);
+  async::disconnect(h2);
 
-  cmd_reader->Subscribe(cmd_aggregator);
-  cmd_aggregator->Subscribe(bunch_writer);
-  cmd_aggregator->Subscribe(bunch_file_writer);
-
-  cmd_reader->Read();
 
   return 0;
 }

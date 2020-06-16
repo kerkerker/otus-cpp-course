@@ -5,23 +5,29 @@ if (NOT DEFINED ENV{TRAVIS_BUILD_NUMBER})
     message(STATUS "TRAVIS_BUILD_NUMBER must be set! Using default ($ENV{TRAVIS_BUILD_NUMBER}) instead...")
 endif ()
 
-project(bulk VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+project(async VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 
+find_package(Thread)
 find_package(GTest REQUIRED)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED)
 
-add_executable(bulk main.cpp bulk.cpp)
+add_library(async SHARED async.cpp AsyncBulkManager.cpp bulk.cpp)
+add_executable(async_cli main.cpp)
 add_executable(test_bulk test.cpp bulk.cpp)
+
+set_target_properties(async PROPERTIES PUBLIC_HEADER async.h)
 
 set_target_properties(test_bulk PROPERTIES
         INCLUDE_DIRECTORIES ${GTEST_INCLUDE_DIRS}
         )
 
+target_link_libraries(async_cli async ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(test_bulk GTest::GTest GTest::Main)
 
-install(TARGETS bulk RUNTIME DESTINATION bin)
+install(TARGETS async LIBRARY DESTINATION lib PUBLIC_HEADER DESTINATION include)
+install(TARGETS async_cli RUNTIME DESTINATION bin)
 
 set(CPACK_GENERATOR DEB)
 

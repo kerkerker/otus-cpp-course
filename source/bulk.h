@@ -82,11 +82,8 @@ std::ostream &operator<<(std::ostream &os, Bunch const &bunch);
 
 class CommandReader : public BasicObservable<Command> {
 public:
-  explicit CommandReader(std::istream &is);
-  void Read();
-
-private:
-  std::istream &is_;
+  void Read(std::istream &is);
+  void Stop();
 };
 
 class CommandAggregator : public BasicObservable<Bunch>, public Observer<Command> {

@@ -12,12 +12,13 @@ TEST(bulk, basic) {
 
   std::stringstream sout;
 
-  auto cmd_reader = std::make_shared<CommandReader>(ss);
+  auto cmd_reader = std::make_shared<CommandReader>();
   auto cmd_aggregator = std::make_shared<CommandAggregator>(3);
   auto bunch_writer = std::make_shared<BunchWriter>(sout);
   cmd_reader->Subscribe(cmd_aggregator);
   cmd_aggregator->Subscribe(bunch_writer);
-  cmd_reader->Read();
+  cmd_reader->Read(ss);
+  cmd_reader->Stop();
 
   ASSERT_EQ(sout.str(), "bulk: cmd1, cmd2, cmd3\nbulk: cmd4, cmd5\n");
 }
@@ -36,12 +37,13 @@ TEST(bulk, braces) {
 
   std::stringstream sout;
 
-  auto cmd_reader = std::make_shared<CommandReader>(ss);
+  auto cmd_reader = std::make_shared<CommandReader>();
   auto cmd_aggregator = std::make_shared<CommandAggregator>(3);
   auto bunch_writer = std::make_shared<BunchWriter>(sout);
   cmd_reader->Subscribe(cmd_aggregator);
   cmd_aggregator->Subscribe(bunch_writer);
-  cmd_reader->Read();
+  cmd_reader->Read(ss);
+  cmd_reader->Stop();
 
   ASSERT_EQ(sout.str(), "bulk: cmd1, cmd2, cmd3\nbulk: cmd4, cmd5, cmd6, cmd7\n");
 }
@@ -61,12 +63,13 @@ TEST(bulk, nested_braces) {
 
   std::stringstream sout;
 
-  auto cmd_reader = std::make_shared<CommandReader>(ss);
+  auto cmd_reader = std::make_shared<CommandReader>();
   auto cmd_aggregator = std::make_shared<CommandAggregator>(3);
   auto bunch_writer = std::make_shared<BunchWriter>(sout);
   cmd_reader->Subscribe(cmd_aggregator);
   cmd_aggregator->Subscribe(bunch_writer);
-  cmd_reader->Read();
+  cmd_reader->Read(ss);
+  cmd_reader->Stop();
 
   ASSERT_EQ(sout.str(), "bulk: cmd1, cmd2, cmd3, cmd4, cmd5, cmd6\n");
 }
@@ -84,12 +87,13 @@ TEST(bulk, open_brace) {
 
   std::stringstream sout;
 
-  auto cmd_reader = std::make_shared<CommandReader>(ss);
+  auto cmd_reader = std::make_shared<CommandReader>();
   auto cmd_aggregator = std::make_shared<CommandAggregator>(3);
   auto bunch_writer = std::make_shared<BunchWriter>(sout);
   cmd_reader->Subscribe(cmd_aggregator);
   cmd_aggregator->Subscribe(bunch_writer);
-  cmd_reader->Read();
+  cmd_reader->Read(ss);
+  cmd_reader->Stop();
 
   ASSERT_EQ(sout.str(), "bulk: cmd1, cmd2, cmd3\n");
 }

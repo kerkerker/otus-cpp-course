@@ -62,16 +62,17 @@ std::ostream &operator<<(std::ostream &os, Bunch const &bunch) {
 
 // CommandReader
 
-CommandReader::CommandReader(std::istream &is) : is_{is} {}
-
-void CommandReader::Read() {
+void CommandReader::Read(std::istream &is) {
   Command cmd;
-  while (is_ >> cmd) {
+  while (is >> cmd) {
     Notify(cmd);
     if (cmd.isEmpty()) {
       break;
     }
   }
+}
+
+void CommandReader::Stop() {
   Notify(Command{});
 }
 
