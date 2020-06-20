@@ -1,17 +1,39 @@
 #include "async.h"
+#include "BulkServer.h"
 
-int main(int argc, char **argv) {
+#include <iostream>
 
-  std::size_t bulk = 5;
-  auto h = async::connect(bulk);
-  auto h2 = async::connect(bulk);
-  async::receive(h, "1", 1);
-  async::receive(h2, "1\n", 2);
-  async::receive(h, "\n2\n3\n4\n5\n6\n{\na\n", 15);
-  async::receive(h, "b\nc\nd\n}\n89\n", 11);
-  async::disconnect(h);
-  async::disconnect(h2);
+int main(int argc, char* argv[])
+{
+  try
+  {
+    if (argc != 3)
+    {
+      std::cerr << "Usage: bulk_server <port> <bulk_size>\n";
+      return 1;
+    }
 
+    int port = std::stoi(argv[1]);
+    if (port < 0) {
+      std::cout << "port must be 0 or greater" << std::endl;
+      return 1;
+    }
+
+    int bulk_size = std::stoll(argv[2]);
+    if (bulk_size < 1) {
+      std::cout << "bulk_size must be 1 or greater" << std::endl;
+      return 1;
+    }
+
+    boost::asio::io_context io_context;
+    async::BulkServer bulk_server{io_context, static_cast<uint16_t>(port), static_cast<size_t>(bulk_size)};
+    bulk_server.Run();
+    io_context.run();
+  }
+  catch (const std::exception& ex)
+  {
+    std::cerr << "Exception: " << ex.what() << "\n";
+  }
 
   return 0;
 }
